@@ -20,17 +20,17 @@ export default function CarbonEmission() {
     cylinders: ""
   });
 
-  const [result, setResult] = useState<{ immediate_action: string; tip1: string; tip2: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [result2, setResult2] = useState<{ immediate_action: string; tip1: string; tip2: string } | null>(null);
+  const [error3, setError3] = useState<string | null>(null);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit2 = async (e: React.FormEvent) => {
     e.preventDefault();
-    setError(null);
-    setResult(null);
+    setError3(null);
+    setResult2(null);
 
     if (
       !formData.speed ||
@@ -42,7 +42,7 @@ export default function CarbonEmission() {
       !formData.engine_size ||
       !formData.cylinders
     ) {
-      setError("Please fill in all required fields.");
+      setError3("Please fill in all required fields.");
       return;
     }
 
@@ -75,29 +75,30 @@ export default function CarbonEmission() {
       Return the response strictly in JSON format.
       `;
 
-      const geminiResult = await chatSession.sendMessage(emissionPrompt);
-      const responseText = geminiResult?.response?.text();
+      const geminiResult2 = await chatSession.sendMessage(emissionPrompt);
+      const responseText = geminiResult2?.response?.text();
 
       if (responseText) {
-        const parsedResult = JSON.parse(responseText);
-        setResult(parsedResult);
+        const parsedResult2 = JSON.parse(responseText);
+        setResult2(parsedResult2);
       } else {
-        setError("Failed to get prediction from Gemini.");
+        setError3("Failed to get prediction from Gemini.");
       }
     } catch (err) {
-      console.error("Error:", err);
-      setError("Failed to connect to the server or Gemini API");
+      console.error("Error3:", err);
+      setError3("Failed to connect to the server or Gemini API");
     }
   };
 
   return (
     <section>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-8 p-10 min-h-screen bg-gray-50">
+      <div className="gap-8 p-10 min-h-screen bg-gray-50">
+        
         <div className="space-y-4">
           <h1 className="text-3xl font-semibold">Carbon Emission Predictor</h1>
          
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <form onSubmit={handleSubmit2} className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <select name="make" value={formData.make} onChange={handleChange} className="p-2 border rounded">
               {["BMW", "Chevrolet", "Ford", "Honda", "Mercedes", "Tesla", "Toyota"].map((brand) => (
                   <option key={brand} value={brand}>{brand}</option>
@@ -145,20 +146,22 @@ export default function CarbonEmission() {
 
 
         <div className="flex items-center justify-center bg-white shadow-lg p-6 rounded-lg">
-          {result ? (
+          {result2 ? (
               <div>
               <h2 className="text-xl font-semibold">Immediate Action:</h2>
-              <p className="text-green-600">{result.immediate_action}</p>
+              <p className="text-green-600">{result2.immediate_action}</p>
               <h2 className="text-xl font-semibold mt-4">Tips:</h2>
-              <p className="text-blue-600">1. {result.tip1}</p>
-              <p className="text-blue-600">2. {result.tip2}</p>
+              <p className="text-blue-600">1. {result2.tip1}</p>
+              <p className="text-blue-600">2. {result2.tip2}</p>
             </div>
-          ) : error ? (
-            <p className="text-red-600 text-xl font-semibold">{error}</p>
+          ) : error3 ? (
+            <p className="text-red-600 text-xl font-semibold">{error3}</p>
           ) : (
             <p className="text-gray-500 text-lg">Enter details to predict emissions</p>
           )}
         </div>
+
+        
       </div>
     </section>
   );
