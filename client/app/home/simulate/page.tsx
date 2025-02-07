@@ -55,40 +55,40 @@ export default function CarbonEmissionSimulator() {
   }, [formData.speed, formData.acceleration]);
 
   return (
-    <section>
+    <section className="min-h-screen bg-gray-100 flex flex-col">
       <ANavbar />
-      <div className="flex flex-col items-center p-10 min-h-screen bg-gray-50">
-        <h1 className="text-3xl font-semibold mb-6">Carbon Emission Simulator</h1>
-        <div className="space-y-4">
-          <div className="flex gap-4">
+      <div className="flex flex-col items-center p-10 flex-grow">
+        <h1 className="text-4xl font-bold mb-8 text-gray-800">Carbon Emission Simulator</h1>
+        <div className="bg-white shadow-md p-6 rounded-lg w-full max-w-4xl">
+          <div className="flex justify-center gap-6 mb-6">
             <button
               onClick={() => handleChange("speed", formData.speed + 5)}
-              className="bg-green-500 text-white px-4 py-2 rounded"
+              className="bg-green-500 hover:bg-green-600 text-white px-5 py-2 rounded-lg shadow"
             >
               Accelerate
             </button>
             <button
               onClick={() => handleChange("speed", Math.max(0, formData.speed - 5))}
-              className="bg-red-500 text-white px-4 py-2 rounded"
+              className="bg-red-500 hover:bg-red-600 text-white px-5 py-2 rounded-lg shadow"
             >
               Brake
             </button>
           </div>
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
             {Object.keys(formData).map((key) => (
               <div key={key} className="flex flex-col">
-                <label className="text-sm font-medium">{key.replace("_", " ").toUpperCase()}</label>
+                <label className="text-sm font-medium text-gray-700">{key.replace("_", " ").toUpperCase()}</label>
                 <input
                   type={typeof formData[key] === "number" ? "number" : "text"}
                   value={formData[key]}
                   onChange={(e) => handleChange(key, typeof formData[key] === "number" ? parseFloat(e.target.value) || 0 : e.target.value)}
-                  className="p-2 border rounded"
+                  className="p-2 border rounded-lg focus:ring focus:ring-blue-300"
                 />
               </div>
             ))}
           </div>
         </div>
-        <div className="mt-6 bg-white shadow-lg p-6 rounded-lg text-center">
+        <div className="mt-6 bg-white shadow-lg p-6 rounded-lg w-full max-w-3xl text-center">
           {result ? (
             <p className="text-green-600 text-xl font-semibold">{result}</p>
           ) : error ? (
