@@ -19,7 +19,50 @@ const items = [
     link: 'https://google.com/',
     title: 'Tip 3',
     description: 'Every gentle brake,every steady speed,is a step toward a greener future.'
-  }
+  },
+
+  {
+    image: 'https://picsum.photos/600/600?grayscale',
+    link: 'https://google.com/',
+    title: 'Tip 4',
+    description: 'Drive smooth, save fuel.'
+  },
+
+  {
+    image: 'https://picsum.photos/600/600?grayscale',
+    link: 'https://google.com/',
+    title: 'Tip 5',
+    description: 'Safe driving is smart driving.'
+  },
+  
+  {
+    image: 'https://picsum.photos/600/600?grayscale',
+    link: 'https://google.com/',
+    title: 'Tip 6',
+    description: 'Brake less, coast more'
+  },
+
+  {
+    image: 'https://picsum.photos/600/600?grayscale',
+    link: 'https://google.com/',
+    title: 'Tip 7',
+    description: 'A well-tuned car runs cleaner'
+  },
+
+  {
+    image: 'https://picsum.photos/600/600?grayscale',
+    link: 'https://google.com/',
+    title: 'Tip 8',
+    description: 'Less speed, less fuel, less pollution.'
+  },
+
+  {
+    image: 'https://picsum.photos/600/600?grayscale',
+    link: 'https://google.com/',
+    title: 'Tip 9',
+    description: 'Fewer brakes, fewer emissions.'
+  },
+
 ];
 
 export default function Page() {
