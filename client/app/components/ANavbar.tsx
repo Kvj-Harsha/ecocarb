@@ -21,6 +21,7 @@ const NavbarAdmin: React.FC = () => {
     { name: 'Calculate', path: '/home/calculate' },
     { name: 'Pattern', path: '/home/pattern' },
     { name: 'AI', path: '/home/recomend' },
+    { name: 'Trips', path: '/home/trips' },
   ];
 
   const toggleMenu = () => {
