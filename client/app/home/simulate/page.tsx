@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FaCar, FaClock, FaCloud } from "react-icons/fa";
+import { FaCar, FaClock, FaCloud,FaExclamationTriangle } from "react-icons/fa";
 import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
 
 export default function CarbonEmissionSimulator() {
@@ -24,7 +24,12 @@ export default function CarbonEmissionSimulator() {
   });
   const [result, setResult] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [result_2, setResult_2] = useState<string | null>(null);
+  const [error_2, setError_2] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
+  const [extraEmission, setExtraEmission] = useState<number | null>(null);
+  const [harshDrivingData, setHarshDrivingData] = useState<{ time: string; harshDriving:  number }[]>([]);
+
 
   // Simulation data: speed, acceleration, distance over time
   const [simData, setSimData] = useState<
@@ -71,6 +76,30 @@ export default function CarbonEmissionSimulator() {
       setError("Failed to connect to the server");
     }
   };
+  const handlePredict_harshdrivinng = async () => {
+    setError_2(null);
+    setResult_2(null);
+    try {
+        const response = await fetch("http://127.0.0.1:5001/predict-harsh-driving", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify(formData),
+        });
+
+        const data = await response.json();
+        console.log("API Response:", data); // Debugging
+
+        if (response.ok) {
+            setResult_2(`Harsh Driving: ${data.harsh_driving ? "Yes" : "No"}`);
+            setExtraEmission(data.harsh_driving ? data.harsh_emission || 0 : 0); // Ensure valid number
+            setHarshDrivingData((prev) => [...prev, { time: new Date().toLocaleTimeString(), harshDriving: data.harsh_driving ? 1 : 0 }]);
+        } else {
+            setError_2(data.error || "An error occurred");
+        }
+    } catch (err) {
+        setError_2("Failed to connect to the server");
+    }
+};
 
   // Start simulation: update simulation parameters and push new data points
   const startTrip = () => {
@@ -103,6 +132,7 @@ export default function CarbonEmissionSimulator() {
 
   // Whenever formData changes, update the predicted emission (and its graph) by calling the API
   useEffect(() => {
+    handlePredict_harshdrivinng();
     handlePredict();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [formData.speed, formData.acceleration, formData.distance_traveled, formData.fuel_type]);
@@ -181,6 +211,31 @@ export default function CarbonEmissionSimulator() {
               <Line type="monotone" dataKey="emission" stroke="#ff0000" strokeWidth={2} />
             </LineChart>
           </ResponsiveContainer>
+          
+        {/* <div className="w-full md:w-1/2 bg-white p-6 shadow-lg rounded-lg"> */}
+                          <h2 className=" mt-9 text-3xl font-bold mb-4">Harsh Driving Status</h2>
+                          <div className="text-2xl font-bold text-red-600 mb-6 flex items-center gap-2">
+                              <FaExclamationTriangle /> {result_2 || "Analyzing..."}
+                          </div>
+                          {extraEmission !== null && (
+                              <div className="text-lg font-medium text-gray-800 mb-4">
+          Extra Carbon Emission Due to Harsh Driving: 
+          <span className="font-bold text-red-500">
+              {extraEmission ? extraEmission : "0.0000"} grams of CO₂
+          </span>
+      </div>
+      
+                          )}
+                          <ResponsiveContainer width="100%" height={300}>
+                              <LineChart data={harshDrivingData}>
+                                  <CartesianGrid strokeDasharray="3 3" />
+                                  <XAxis dataKey="time" />
+                                  <YAxis label={{ value: "Harsh Driving", angle: -90, position: "insideLeft" }} />
+                                  <Tooltip />
+                                  <Line type="monotone" dataKey="harshDriving" stroke="#ff0000" strokeWidth={2} />
+                              </LineChart>
+                          </ResponsiveContainer>
+
         </div>
       </div>
       {/* Bottom Section: Simulation Parameters Graph */}

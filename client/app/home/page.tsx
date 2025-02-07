@@ -1,5 +1,5 @@
 import React from 'react'
-import ANavbar from '../components/Anavbar'
+import ANavbar from './../components/ANavbar'
 
 const page = () => {
   return (
