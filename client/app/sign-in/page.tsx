@@ -32,12 +32,12 @@ export default function SignIn() {
   return (
     <section className="bg-black min-h-screen flex flex-col">
       <Navbar />
-      <div className="flex flex-grow items-center justify-center px-6 py-12">
-        <div className="bg-gray-950 shadow-lg rounded-lg p-8 max-w-md w-full">
-          <h2 className="text-2xl font-semibold text-center text-white mb-6">Sign In</h2>
+      <div className="flex flex-grow items-center justify-center px-6 py-12 rounded-xl ">
+        <div className="bg-white/[0.9] text-black shadow-lg rounded-xl p-8 max-w-md w-full">
+          <h2 className="text-2xl font-semibold text-center  mb-6">Sign In</h2>
           <form onSubmit={handleSignIn} className="text-black space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-white">
+              <label htmlFor="email" className="block text-sm font-medium ">
                 Email
               </label>
               <input
@@ -50,7 +50,7 @@ export default function SignIn() {
               />
             </div>
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-white">
+              <label htmlFor="password" className="block text-sm font-medium text-black">
                 Password
               </label>
               <input
@@ -65,19 +65,19 @@ export default function SignIn() {
             {error && <p className="text-red-500 text-sm text-center">{error}</p>}
             <button
               type="submit"
-              className="w-full bg-blue-600 hover:bg-blue-700 text-black font-semibold py-2 rounded-md transition duration-300"
+              className="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 rounded-md transition duration-300"
             >
               Sign In
             </button>
           </form>
           <div className="flex items-center justify-center my-4">
             <span className="w-full border-t"></span>
-            <span className="px-2 text-white">OR</span>
+            <span className="px-2 text-black">OR</span>
             <span className="w-full border-t"></span>
           </div>
           <button
             onClick={handleGoogleSignIn}
-            className="w-full flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-black font-semibold py-2 rounded-md transition duration-300"
+            className="w-full text-white flex items-center justify-center gap-2 bg-red-500 hover:bg-red-600 text-black font-semibold py-2 rounded-md transition duration-300"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"
