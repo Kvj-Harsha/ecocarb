@@ -1,8 +1,17 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { FaCar, FaClock, FaCloud,FaExclamationTriangle } from "react-icons/fa";
-import { LineChart, Line, XAxis, YAxis, Tooltip, CartesianGrid, ResponsiveContainer } from "recharts";
+import { FaCar, FaClock, FaCloud, FaExclamationTriangle } from "react-icons/fa";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  CartesianGrid,
+  ResponsiveContainer,
+} from "recharts";
+import { chatSession } from "@/app/service/AIModal";
 
 export default function CarbonEmissionSimulator() {
   // Form state with simulation parameters
@@ -22,14 +31,22 @@ export default function CarbonEmissionSimulator() {
     model: 2022,
     transmission: "Manual",
   });
+
   const [result, setResult] = useState<string | null>(null);
+  const [result2, setResult2] = useState<{
+    immediate_action: string;
+    tip1: string;
+    tip2: string;
+  } | null>(null);
+  const [error3, setError3] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [result_2, setResult_2] = useState<string | null>(null);
   const [error_2, setError_2] = useState<string | null>(null);
   const [isRunning, setIsRunning] = useState(false);
   const [extraEmission, setExtraEmission] = useState<number | null>(null);
-  const [harshDrivingData, setHarshDrivingData] = useState<{ time: string; harshDriving:  number }[]>([]);
-
+  const [harshDrivingData, setHarshDrivingData] = useState<
+    { time: string; harshDriving: number }[]
+  >([]);
 
   // Simulation data: speed, acceleration, distance over time
   const [simData, setSimData] = useState<
@@ -47,13 +64,68 @@ export default function CarbonEmissionSimulator() {
     setFormData((prev) => ({ ...prev, [field]: value }));
   };
 
+  // Gemini prediction function (refactored from handleSubmit)
+  const generateGeminiPrediction = async () => {
+    setError3(null);
+    setResult2(null);
+
+    // Check required fields
+
+
+    try {
+      const emissionPrompt = `
+      Given the following vehicle parameters, predict the CO2 emissions and provide driving recommendations:
+      
+      Vehicle Details:
+      - Make: ${formData.make}
+      - Model Year: ${formData.model}
+      - Speed: ${formData.speed} km/h
+      - Acceleration: ${formData.acceleration} m/s²
+      - Fuel Efficiency: ${formData.fuel_efficiency} L/100km
+      - Distance Traveled: ${formData.distance_traveled} km
+      - Traffic Condition: ${formData.traffic_condition} (1: Light traffic, 5: Heavy traffic)
+      - Road Gradient: ${formData.road_gradient}°
+      - Fuel Type: ${formData.fuel_type}
+      - Car Age: ${formData.car_age} years
+      - Vehicle Type: ${formData.vehicle_type}
+      - Transmission: ${formData.transmission}
+      - Engine Size: ${formData.engine_size} L
+      - Cylinders: ${formData.cylinders}
+      
+      Expected Output:
+      {
+        "immediate_action": "Your immediate action here",
+        "tip1": "First driving tip here",
+        "tip2": "Second driving tip here"
+      }
+      Return the response strictly in JSON format.
+      `;
+
+      const geminiResult2 = await chatSession.sendMessage(emissionPrompt);
+      const responseText = geminiResult2?.response?.text();
+
+      if (responseText) {
+        const parsedResult2 = JSON.parse(responseText);
+        setResult2(parsedResult2);
+      } else {
+        setError3("Failed to get prediction from Gemini.");
+      }
+    } catch (err) {
+      console.error("Error3:", err);
+      setError3("Failed to connect to the server or Gemini API");
+    }
+  };
+
   // Call the API to predict CO₂ emission and update the emission graph
   const handlePredict = async () => {
     setError(null);
     setResult(null);
     if (formData.distance_traveled === 0 || formData.fuel_type === "Electric") {
       setResult("Predicted CO₂ Emission: 0 grams");
-      setEmissionGraphData((prev) => [...prev, { time: new Date().toLocaleTimeString(), emission: 0 }]);
+      setEmissionGraphData((prev) => [
+        ...prev,
+        { time: new Date().toLocaleTimeString(), emission: 0 },
+      ]);
       return;
     }
     try {
@@ -76,30 +148,34 @@ export default function CarbonEmissionSimulator() {
       setError("Failed to connect to the server");
     }
   };
+
   const handlePredict_harshdrivinng = async () => {
     setError_2(null);
     setResult_2(null);
     try {
-        const response = await fetch("http://127.0.0.1:5001/predict-harsh-driving", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(formData),
-        });
+      const response = await fetch("http://127.0.0.1:5001/predict-harsh-driving", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(formData),
+      });
 
-        const data = await response.json();
-        console.log("API Response:", data); // Debugging
+      const data = await response.json();
+      console.log("API Response:", data); // Debugging
 
-        if (response.ok) {
-            setResult_2(`Harsh Driving: ${data.harsh_driving ? "Yes" : "No"}`);
-            setExtraEmission(data.harsh_driving ? data.harsh_emission || 0 : 0); // Ensure valid number
-            setHarshDrivingData((prev) => [...prev, { time: new Date().toLocaleTimeString(), harshDriving: data.harsh_driving ? 1 : 0 }]);
-        } else {
-            setError_2(data.error || "An error occurred");
-        }
+      if (response.ok) {
+        setResult_2(`Harsh Driving: ${data.harsh_driving ? "Yes" : "No"}`);
+        setExtraEmission(data.harsh_driving ? data.harsh_emission || 0 : 0); // Ensure valid number
+        setHarshDrivingData((prev) => [
+          ...prev,
+          { time: new Date().toLocaleTimeString(), harshDriving: data.harsh_driving ? 1 : 0 },
+        ]);
+      } else {
+        setError_2(data.error || "An error occurred");
+      }
     } catch (err) {
-        setError_2("Failed to connect to the server");
+      setError_2("Failed to connect to the server");
     }
-};
+  };
 
   // Start simulation: update simulation parameters and push new data points
   const startTrip = () => {
@@ -116,11 +192,16 @@ export default function CarbonEmissionSimulator() {
         // Update simulation graph data
         setSimData((prevSim) => [
           ...prevSim,
-          { time: new Date().toLocaleTimeString(), speed: newSpeed, acceleration: newAcceleration, distance: newDistance },
+          {
+            time: new Date().toLocaleTimeString(),
+            speed: newSpeed,
+            acceleration: newAcceleration,
+            distance: newDistance,
+          },
         ]);
         return { ...prev, acceleration: newAcceleration, speed: newSpeed, distance_traveled: newDistance };
       });
-    }, 5000);
+    }, 10000);
   };
 
   const stopTrip = () => {
@@ -130,26 +211,28 @@ export default function CarbonEmissionSimulator() {
     }
   };
 
-  // Whenever formData changes, update the predicted emission (and its graph) by calling the API
+  // Automatically trigger all API predictions when key simulation parameters update
   useEffect(() => {
     handlePredict_harshdrivinng();
     handlePredict();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    generateGeminiPrediction();
   }, [formData.speed, formData.acceleration, formData.distance_traveled, formData.fuel_type]);
 
   return (
-    <section className="min-h-screen bg-gray-100 p-6 flex flex-col gap-6">
-      {/* Top row: left side (form) & right side (predicted CO₂ emission) */}
-      <div className="flex flex-col md:flex-row gap-6">
-        {/* Left Side: Form & Simulation Controls */}
-        <div className="w-full md:w-1/2 bg-white p-6 shadow-lg rounded-lg">
+    <section className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-100 min-h-screen ">
+
+      {/* form  this should be half left*/}
+      <div className="md:col-span-1 p-4 border rounded-lg shadow-md bg-white">
+        <form className="w-full">
           <h2 className="text-3xl font-bold text-gray-800 flex items-center gap-2 mb-4">
             <FaCar /> Simulation Parameters
           </h2>
           <div className="grid grid-cols-1 gap-4">
             {Object.keys(formData).map((key) => (
               <div key={key} className="flex flex-col">
-                <label className="text-sm font-medium text-gray-700">{key.replace("_", " ").toUpperCase()}</label>
+                <label className="text-sm font-medium text-gray-700">
+                  {key.replace("_", " ").toUpperCase()}
+                </label>
                 {key === "fuel_type" || key === "vehicle_type" ? (
                   <select
                     value={formData[key]}
@@ -177,7 +260,12 @@ export default function CarbonEmissionSimulator() {
                     type={typeof formData[key] === "number" ? "number" : "text"}
                     value={formData[key]}
                     onChange={(e) =>
-                      handleChange(key, typeof formData[key] === "number" ? parseFloat(e.target.value) || 0 : e.target.value)
+                      handleChange(
+                        key,
+                        typeof formData[key] === "number"
+                          ? parseFloat(e.target.value) || 0
+                          : e.target.value
+                      )
                     }
                     className="p-2 border rounded-lg focus:ring focus:ring-blue-300"
                   />
@@ -186,7 +274,9 @@ export default function CarbonEmissionSimulator() {
             ))}
           </div>
           <div className="mt-6 flex gap-4">
+            {/* Trip start/stop button */}
             <button
+              type="button"
               onClick={isRunning ? stopTrip : startTrip}
               className={`px-5 py-3 rounded-lg shadow-lg text-white text-lg font-semibold transition ${
                 isRunning ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
@@ -195,51 +285,82 @@ export default function CarbonEmissionSimulator() {
               <FaClock className="mr-2" /> {isRunning ? "Stop Trip" : "Start Trip"}
             </button>
           </div>
-        </div>
-        {/* Right Side: Predicted CO₂ Emission & Emission Graph */}
-        <div className="w-full md:w-1/2 bg-white p-6 shadow-lg rounded-lg">
-          <h2 className="text-3xl font-bold mb-4">Predicted CO₂ Emission</h2>
-          <div className="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
-            <FaCloud /> {result || "CO₂ Emission: -- grams"}
-          </div>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={emissionGraphData}>
-              <CartesianGrid strokeDasharray="3 3" />
-              <XAxis dataKey="time" />
-              <YAxis label={{ value: "Emission (g)", angle: -90, position: "insideLeft" }} />
-              <Tooltip />
-              <Line type="monotone" dataKey="emission" stroke="#ff0000" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-          
-        {/* <div className="w-full md:w-1/2 bg-white p-6 shadow-lg rounded-lg"> */}
-                          <h2 className=" mt-9 text-3xl font-bold mb-4">Harsh Driving Status</h2>
-                          <div className="text-2xl font-bold text-red-600 mb-6 flex items-center gap-2">
-                              <FaExclamationTriangle /> {result_2 || "Analyzing..."}
-                          </div>
-                          {extraEmission !== null && (
-                              <div className="text-lg font-medium text-gray-800 mb-4">
-          Extra Carbon Emission Due to Harsh Driving: 
-          <span className="font-bold text-red-500">
-              {extraEmission ? extraEmission : "0.0000"} grams of CO₂
-          </span>
+        </form>
       </div>
-      
-                          )}
-                          <ResponsiveContainer width="100%" height={300}>
-                              <LineChart data={harshDrivingData}>
-                                  <CartesianGrid strokeDasharray="3 3" />
-                                  <XAxis dataKey="time" />
-                                  <YAxis label={{ value: "Harsh Driving", angle: -90, position: "insideLeft" }} />
-                                  <Tooltip />
-                                  <Line type="monotone" dataKey="harshDriving" stroke="#ff0000" strokeWidth={2} />
-                              </LineChart>
-                          </ResponsiveContainer>
 
-        </div>
+
+      <div className="col-span-2 grid grid-cols-1 grid-cols-2 gap-6">
+        
+                {/* carbon emmited  this should 1/3 of right*/}
+                <div className="w-full bg-white p-4 border rounded-lg shadow-md">
+                  <h2 className="text-3xl font-bold mb-4">Predicted CO₂ Emission</h2>
+                  <div className="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
+                    <FaCloud /> {result || "CO₂ Emission: -- grams"}
+                  </div>
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={emissionGraphData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" />
+                      <YAxis label={{ value: "Emission (g)", angle: -90, position: "insideLeft" }} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="emission" stroke="#ff0000" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Harsh Driving  this should 1/3 of right */}
+                <div className="w-full bg-white p-4 border rounded-lg shadow-md">
+                  <h2 className="text-3xl font-bold mb-4">Harsh Driving Status</h2>
+                  <div className="text-2xl font-bold text-red-600 mb-6 flex items-center gap-2">
+                    <FaExclamationTriangle /> {result_2 || "Analyzing..."}
+                  </div>
+                  {extraEmission !== null && (
+                    <div className="text-lg font-medium text-gray-800 mb-4">
+                      Extra Carbon Emission Due to Harsh Driving:{" "}
+                      <span className="font-bold text-red-500">
+                        {extraEmission ? extraEmission : "0.0000"} grams of CO₂
+                      </span>
+                    </div>
+                  )}
+                  <ResponsiveContainer width="100%" height={300}>
+                    <LineChart data={harshDrivingData}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="time" />
+                      <YAxis label={{ value: "Harsh Driving", angle: -90, position: "insideLeft" }} />
+                      <Tooltip />
+                      <Line type="monotone" dataKey="harshDriving" stroke="#ff0000" strokeWidth={2} />
+                    </LineChart>
+                  </ResponsiveContainer>
+                </div>
+
+                {/* Gemini API Prediction Results  this should 1/3 of right */}
+                <div className="col-span-2 p-4 border text-4xl rounded-lg shadow-md bg-white">
+                  {result2 ? (
+                    <div>
+                      
+                        <div className="p-4">
+                          <h2 className="">Immediate Action:</h2>
+                          <p className="text-green-600">{result2.immediate_action}</p>
+                        </div>
+
+                        <div className="p-4">
+                          <h2>Tips:</h2>
+                          <p className="text-blue-600">1. {result2.tip1}</p>
+                          <p className="text-blue-600">2. {result2.tip2}</p>
+                        </div>
+
+                    </div>
+                  ) : error3 ? (
+                    <p className="text-red-600 text-xl font-semibold">{error3}</p>
+                  ) : (
+                    <p className="text-gray-500 text-lg">Waiting for Gemini Prediction...</p>
+                  )}
+                </div>
+
       </div>
-      {/* Bottom Section: Simulation Parameters Graph */}
-      <div className="w-full bg-white p-6 shadow-lg rounded-lg">
+
+      {/* Metrics Graph down of both */}
+      <div className="md:col-span-3 p-4 border rounded-lg shadow-md bg-white">
         <h2 className="text-2xl font-bold mb-4">Simulation Parameters Over Time</h2>
         <ResponsiveContainer width="100%" height={300}>
           <LineChart data={simData}>
@@ -282,6 +403,8 @@ export default function CarbonEmissionSimulator() {
           </LineChart>
         </ResponsiveContainer>
       </div>
+
+
     </section>
   );
 }
