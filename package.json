@@ -1,5 +1,9 @@
 {
   "dependencies": {
-    "framer-motion": "^12.4.0"
+    "clsx": "^2.1.1",
+    "framer-motion": "^12.4.1",
+    "gl-matrix": "^3.4.3",
+    "motion": "^12.4.1",
+    "tailwind-merge": "^3.0.1"
   }
 }
