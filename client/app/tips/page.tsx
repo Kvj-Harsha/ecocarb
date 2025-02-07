@@ -1,4 +1,5 @@
 import InfiniteMenu from '../components/InfiniteMenu';
+import Navbar from '../components/Navbar';
 
 const items = [
   {
@@ -24,8 +25,11 @@ const items = [
 
 export default function Page() {
   return (
+    <section>
+      <Navbar/>
     <div style={{ height: '700px', position: 'relative', color: 'white' }}>
       <InfiniteMenu items={items} />
     </div>
+    </section>
   );
 }
