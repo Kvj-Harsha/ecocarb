@@ -1,6 +1,5 @@
 "use client";
 
-import ANavbar from "@/app/components/Anavbar";
 import { useState } from "react";
 
 export default function CarbonEmission() {
@@ -64,7 +63,6 @@ export default function CarbonEmission() {
 
   return (
     <section>
-      <ANavbar />
       <div className="grid grid-cols-2 gap-8 p-10 min-h-screen bg-gray-50">
         <div className="space-y-4">
           <h1 className="text-3xl font-semibold">Carbon Emission Predictor</h1>
