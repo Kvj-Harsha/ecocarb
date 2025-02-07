@@ -92,10 +92,10 @@ export default function CarbonEmission() {
 
   return (
     <section>
-      <div className="gap-8 p-10 min-h-screen bg-gray-50">
+      <div className="gap-8 p-10 min-h-screen bg-black">
         
         <div className="space-y-4">
-          <h1 className="text-3xl font-semibold">Carbon Emission Predictor</h1>
+          <h1 className="text-3xl text-white font-semibold">Carbon Emission Predictor</h1>
          
 
         <form onSubmit={handleSubmit2} className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -157,7 +157,8 @@ export default function CarbonEmission() {
           ) : error3 ? (
             <p className="text-red-600 text-xl font-semibold">{error3}</p>
           ) : (
-            <p className="text-gray-500 text-lg">Enter details to predict emissions</p>
+            // <br/>
+            <p className="text-gray-500 text-lg p-5">Enter details to predict emissions</p>
           )}
         </div>
 

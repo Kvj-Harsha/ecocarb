@@ -16,11 +16,11 @@ const NavbarAdmin: React.FC = () => {
   const pathname = usePathname(); 
 
   const navItems = [
-    { name: 'Home', path: '/admin' },
-    { name: 'Add Events', path: '/admin/add-event' },
-    { name: 'Edit Events', path: '/admin/events' },
-    { name: 'Deletion-request', path: '/admin/deletion' },
-    { name: 'Feedback', path: '/admin/feedback' },
+    { name: 'Home', path: '/home' },
+    { name: 'Simulate', path: '/home/simulate' },
+    { name: 'Calculate', path: '/home/calculate' },
+    { name: 'Pattern', path: '/home/pattern' },
+    { name: 'AI', path: '/home/recomend' },
   ];
 
   const toggleMenu = () => {

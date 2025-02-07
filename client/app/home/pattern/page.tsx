@@ -85,7 +85,7 @@ export default function HarshDrivingDetector() {
     }, [formData.speed, formData.acceleration]);
 
     return (
-        <section className="min-h-screen bg-gray-100 p-6 flex flex-col gap-6">
+        <section className="min-h-screen bg-black p-6 flex flex-col gap-6">
             <div className="flex flex-col md:flex-row gap-6">
                 <div className="w-full md:w-1/2 bg-white p-6 shadow-lg rounded-lg">
                     <h2 className="text-3xl font-bold flex items-center gap-2 mb-4">

@@ -65,9 +65,9 @@ import { useState } from "react";
   return (
     <section>
       {/* <ANavbar /> */}
-      <div className="grid grid-cols-2 gap-8 p-10 min-h-screen bg-gray-50">
+      <div className="grid grid-cols-2 gap-8 p-10 min-h-screen bg-black">
         <div className="space-y-4">
-          <h1 className="text-3xl font-semibold">Carbon Emission Predictor</h1>
+          <h1 className="text-3xl text-white font-semibold">Carbon Emission Predictor</h1>
           <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-4">
             <select name="make" value={formData.make} onChange={handleChange} className="p-2 border rounded">
               {["BMW", "Chevrolet", "Ford", "Honda", "Mercedes", "Tesla", "Toyota"].map((brand) => (

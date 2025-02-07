@@ -2,6 +2,9 @@
 
 import { useState, useEffect, useRef } from "react";
 import { FaCar, FaClock, FaCloud, FaExclamationTriangle, FaMoon, FaSun } from "react-icons/fa";
+
+import { collection, addDoc, serverTimestamp } from "firebase/firestore";
+
 import {
   LineChart,
   Line,
@@ -12,6 +15,10 @@ import {
   ResponsiveContainer,
 } from "recharts";
 import { chatSession } from "@/app/service/AIModal";
+import { auth, db } from "@/lib/firebase";
+
+
+
 
 export default function CarbonEmissionSimulator() {
   // Form state with simulation parameters
@@ -134,7 +141,7 @@ export default function CarbonEmissionSimulator() {
     setError(null);
     setResult(null);
     if (formData.distance_traveled === 0 || formData.fuel_type === "Electric") {
-      setResult("Predicted CO₂ Emission: 0 grams");
+      setResult("0");
       setEmissionGraphData((prev) => [
         ...prev,
         { time: new Date().toLocaleTimeString(), emission: 0 },
@@ -149,7 +156,7 @@ export default function CarbonEmissionSimulator() {
       });
       const data = await response.json();
       if (response.ok) {
-        setResult(`Predicted CO₂ Emission: ${data.predicted_emission} grams`);
+        setResult(`${data.predicted_emission}`);
         setEmissionGraphData((prev) => [
           ...prev,
           {
@@ -232,12 +239,41 @@ export default function CarbonEmissionSimulator() {
     }, 10000);
   };
 
-  const stopTrip = () => {
+
+  const generateTripId = () => `trip-${Date.now()}`;
+
+
+  const stopTrip = async (formData: Record<string, string | number>, result: string | null) => { 
     setIsRunning(false);
     if (intervalRef.current) {
       clearInterval(intervalRef.current);
     }
-  };
+
+    // Fetch the current username
+    const username = auth.currentUser?.displayName || "Guest"; // Ensure username is always available
+    if (!username) {
+      console.error("Error: Username is undefined.");
+      return;
+    }
+  
+    const tripId = generateTripId(); // Generate trip ID
+  
+  try {
+    await addDoc(collection(db, "trips"), {
+      tripId,
+      username,
+      date: new Date().toISOString().split("T")[0],
+      timestamp: serverTimestamp(),
+      carbon_emission: result, // ✅ Storing carbon emission
+      ...formData, // ✅ Storing all form data dynamically
+    });
+
+    console.log("Trip data stored successfully!");
+  } catch (error) {
+    console.error("Error storing trip data:", error);
+  }
+};
+  
 
   // Automatically trigger all API predictions when key simulation parameters update
   useEffect(() => {
@@ -262,7 +298,6 @@ export default function CarbonEmissionSimulator() {
     }
   }, []);
   
-
 
   return (
     <section className="bg-gray-100  dark:bg-black">
@@ -333,7 +368,11 @@ export default function CarbonEmissionSimulator() {
               {/* Trip start/stop button */}
               <button
   type="button"
-  onClick={isRunning ? stopTrip : startTrip}
+  onClick={() =>
+    isRunning
+      ? stopTrip(formData, result) // ✅ Pass `result` (carbon emission) along with `formData`
+      : startTrip()
+  }
   className={`flex items-center px-5 py-3 rounded-lg shadow-lg text-white text-lg font-semibold transition ${
     isRunning ? "bg-red-500 hover:bg-red-600" : "bg-green-500 hover:bg-green-600"
   }`}
@@ -352,7 +391,7 @@ export default function CarbonEmissionSimulator() {
           <div className="w-full bg-white p-4 border rounded-lg shadow-md">
             <h2 className="text-3xl font-bold mb-4">Predicted CO₂ Emission</h2>
             <div className="text-2xl font-bold text-green-600 mb-6 flex items-center gap-2">
-              <FaCloud /> {result || "CO₂ Emission: -- grams"}
+              <FaCloud /> Predicted CO₂ Emission: {result || "CO₂ Emission: -- grams"} grams
             </div>
             <ResponsiveContainer width="100%" height={300}>
               <LineChart data={emissionGraphData}>
