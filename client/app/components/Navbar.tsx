@@ -12,10 +12,8 @@ const Navbar: React.FC = () => {
 
   const navItems = [
     { name: 'Home', path: '/' },
+    { name: 'Tips', path: '/tips' },
     { name: 'Team', path: '/members' },
-    { name: 'About', path: '/about' },
-    { name: 'Contact', path: '/contact' },
-    { name: 'Feedback', path: '/feedback' },
   ];
 
   const toggleMenu = () => {
