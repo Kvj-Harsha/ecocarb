@@ -1,5 +1,6 @@
 import React, { ReactNode } from "react";
 import PrivateRoute from "../components/PrivateRoute";
+import ANavbar from "../components/ANavbar";
 
 interface LayoutProps {
   children: ReactNode;
@@ -8,7 +9,10 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children }) => {
   return (
     <PrivateRoute>
-      <div>{children}</div>
+      <div>
+        <ANavbar/>
+        {children}
+      </div>
     </PrivateRoute>
   );
 };
