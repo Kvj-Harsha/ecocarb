@@ -1,5 +1,6 @@
 {
   "dependencies": {
-    "framer-motion": "^12.4.0"
+    "framer-motion": "^12.4.1",
+    "gl-matrix": "^3.4.3"
   }
 }
