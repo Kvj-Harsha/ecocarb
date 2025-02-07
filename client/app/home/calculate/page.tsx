@@ -1,66 +1,66 @@
-"use client";
+  "use client";
 
 // import ANavbar from "@/app/components/Anavbar";
 import { useState } from "react";
 
-export default function CarbonEmission() {
-  const [formData, setFormData] = useState({
-    make: "Tesla",
-    model: "2022",
-    speed: "",
-    acceleration: "",
-    fuel_efficiency: "",
-    distance_traveled: "",
-    traffic_condition: "1",
-    road_gradient: "",
-    fuel_type: "Diesel",
-    car_age: "",
-    vehicle_type: "Sedan",
-    transmission: "Manual",
-    engine_size: "",
-    cylinders: ""
-  });
+  export default function CarbonEmission() {
+    const [formData, setFormData] = useState({
+      make: "Tesla",
+      model: "2022",
+      speed: "",
+      acceleration: "",
+      fuel_efficiency: "",
+      distance_traveled: "",
+      traffic_condition: "1",
+      road_gradient: "",
+      fuel_type: "Diesel",
+      car_age: "",
+      vehicle_type: "Sedan",
+      transmission: "Manual",
+      engine_size: "",
+      cylinders: ""
+    });
 
-  const [result, setResult] = useState<string | null>(null);
-  const [error, setError] = useState<string | null>(null);
+    const [result, setResult] = useState<string | null>(null);
+    const [error, setError] = useState<string | null>(null);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value });
-  };
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      setFormData({ ...formData, [e.target.name]: e.target.value });
+    };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setError(null);
-    setResult(null);
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setError(null);
+      setResult(null);
 
-    try {
-      const response = await fetch("http://127.0.0.1:5000/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          ...formData,
-          speed: parseFloat(formData.speed),
-          acceleration: parseFloat(formData.acceleration),
-          fuel_efficiency: parseFloat(formData.fuel_efficiency),
-          distance_traveled: parseFloat(formData.distance_traveled),
-          road_gradient: parseFloat(formData.road_gradient),
-          car_age: parseInt(formData.car_age),
-          engine_size: parseFloat(formData.engine_size),
-          cylinders: parseInt(formData.cylinders),
-          traffic_condition: parseInt(formData.traffic_condition),
-        }),
-      });
+      try {
+        const response = await fetch("http://127.0.0.1:5000/predict", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ...formData,
+            speed: parseFloat(formData.speed),
+            acceleration: parseFloat(formData.acceleration),
+            fuel_efficiency: parseFloat(formData.fuel_efficiency),
+            distance_traveled: parseFloat(formData.distance_traveled),
+            road_gradient: parseFloat(formData.road_gradient),
+            car_age: parseInt(formData.car_age),
+            engine_size: parseFloat(formData.engine_size),
+            cylinders: parseInt(formData.cylinders),
+            traffic_condition: parseInt(formData.traffic_condition),
+          }),
+        });
 
-      const data = await response.json();
-      if (response.ok) {
-        setResult(`Predicted CO₂ Emission: ${data.predicted_emission} grams`);
-      } else {
-        setError(data.error || "An error occurred");
+        const data = await response.json();
+        if (response.ok) {
+          setResult(`Predicted CO₂ Emission: ${data.predicted_emission} grams`);
+        } else {
+          setError(data.error || "An error occurred");
+        }
+      } catch (err) {
+        setError("Failed to connect to the server");
       }
-    } catch (err) {
-      setError("Failed to connect to the server");
-    }
-  };
+    };
 
   return (
     <section>
@@ -95,16 +95,7 @@ export default function CarbonEmission() {
             <button type="submit" className="col-span-2 bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Predict</button>
           </form>
         </div>
-        <div className="flex items-center justify-center bg-white shadow-lg p-6 rounded-lg">
-          {result ? (
-            <p className="text-green-600 text-xl font-semibold">{result}</p>
-          ) : error ? (
-            <p className="text-red-600 text-xl font-semibold">{error}</p>
-          ) : (
-            <p className="text-gray-500 text-lg">Enter details to predict emissions</p>
-          )}
         </div>
-      </div>
-    </section>
-  );
-}
+      </section>
+    );
+    }

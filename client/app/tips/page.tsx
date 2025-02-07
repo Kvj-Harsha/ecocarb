@@ -2,8 +2,7 @@ import React from 'react'
 
 const page = () => {
   return (
-    <section>
-    </section>
+    <div>Hello Tips Page!</div>
   )
 }
 
