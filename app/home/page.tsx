@@ -1,12 +1,10 @@
 import React from 'react'
-import Navbar from './components/Navbar'
-import Hero from './components/Hero'
+import ANavbar from '../components/Anavbar'
 
 const page = () => {
   return (
     <section>
-      <Navbar/>
-      <Hero/>
+        <ANavbar/>
     </section>
   )
 }
