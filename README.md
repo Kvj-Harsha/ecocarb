@@ -3,6 +3,10 @@
 ## 📌 Overview
 EcoCarb is an AI-driven platform designed to predict carbon emissions from vehicles using machine learning. It leverages **Next.js** for the frontend and **Flask** for the backend, integrating **ML models** for emission prediction and driving behavior analysis. Additionally, it utilizes an open-source **LLM (Gemini Flash 1.5)** to generate AI-driven insights based on real-time vehicle parameters.
 
+## Architechure
+
+![diagram (2)](https://github.com/user-attachments/assets/eb715141-72cd-4400-95dc-d91094098b67)
+
 ## ✨ Features
 ✅ **Carbon Emission Prediction** using **XGBoost** model 📊  
 ✅ **Harsh Driving Detection** with a **Random Forest Classifier** 🚗⚠️  
